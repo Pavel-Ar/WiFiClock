@@ -1,9 +1,7 @@
 # WiFiClock
 Wifi Часы. Обновление с NTP сервера.
 
-ESP8266 (nodemcu v3) 
-
-Red LED Dot Matrix Display Panel 32x16 512 LEDs (MW245TS / 74HC245)
+Red LED Dot Matrix Display Panel 32x16 (512 LEDs) & ESP8266 (nodemcu v3)
 
 ***DMD Connector***
 
