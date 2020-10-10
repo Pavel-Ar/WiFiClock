@@ -26,12 +26,13 @@ String getDate(unsigned long secs);
 
 const int WIDTH = 1;
 const uint8_t *FONT = SystemFont5x7;
-const char *ssid     = "wifi";
-const char *password = "psw";
+const char *ssid     = "fff";
+const char *password = "ppp";
 uint32_t myTimer0, myTimer1;
+uint8_t brihgtness;
 
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, "pool.ntp.org", 3*60*60 ,6*60*60);
+NTPClient timeClient(ntpUDP, "ntp.ix.ru", 3*60*60 ,3*60*60);
 
 SPIDMD dmd(DISPLAYS_WIDE, DISPLAYS_HIGH, pin_noe, pin_A, pin_B, pin_sclk);
 DMD_TextBox box(dmd, 1, 0, 32, 16);
@@ -52,7 +53,7 @@ void setup() {
 
   timeClient.begin();
 
-  dmd.setBrightness(10);
+  dmd.setBrightness(2);
   dmd.selectFont(FONT);
   dmd.begin();
 }
@@ -68,6 +69,16 @@ void loop() {
       String minuteStr = minutes < 10 ? "0" + String(minutes) : String(minutes);
       unsigned long seconds = utime % 60;
       String secondStr = seconds < 10 ? "0" + String(seconds) : String(seconds);
+
+brihgtness = hours > 9 ? 10 : 2;
+brihgtness = hours > 19 ? 2 : 10;
+dmd.setBrightness(brihgtness);
+
+//  if ( (hours > 9) && (hours < 17) ) {
+//    dmd.setBrightness(10);
+//    } else {
+//      dmd.setBrightness(2);;
+//  }
 
       box.clear();
       box.print(hoursStr+":"+minuteStr);
