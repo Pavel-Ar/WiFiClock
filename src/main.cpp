@@ -22,6 +22,7 @@ const char *ssid     = "ssid";
 const char *password = "pass";
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "0.openwrt.pool.ntp.org", 10800, 600000);
+
 //NTPClient timeClient(ntpUDP, "0.openwrt.pool.ntp.org", 10800, 600000);
 //NTPClient timeClient(ntpUDP);
 
