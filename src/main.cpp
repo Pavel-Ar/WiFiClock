@@ -18,10 +18,10 @@
 #define DISPLAYS_HIGH 1
 #define LEAP_YEAR(Y)     ( (Y>0) && !(Y%4) && ( (Y%100) || !(Y%400) ) )
 
-const char *ssid     = "(-Wi-Fi-)";
-const char *password = "007007007";
+const char *ssid     = "SSID";
+const char *password = "PASS";
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, "ntp.moz.su", 10800, 600000);
+NTPClient timeClient(ntpUDP, "ntp.ix.ru", 10800, 600000);
 //NTPClient timeClient(ntpUDP, "0.openwrt.pool.ntp.org", 10800, 600000);
 //NTPClient timeClient(ntpUDP);
 
