@@ -16,17 +16,17 @@
 
 #define DISPLAYS_WIDE 1
 #define DISPLAYS_HIGH 1
-#define LEAP_YEAR(Y)     ( (Y>0) && !(Y%4) && ( (Y%100) || !(Y%400) ) )
+#define LEAP_YEAR(Y)( (Y>0) && !(Y%4) && ( (Y%100) || !(Y%400) ) )
 
-const char *ssid     = "(-Wi-Fi-)";
-const char *password = "007007007";
+const char *ssid     = "ssid";
+const char *password = "pass";
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, "ntp.moz.su", 10800, 600000);
+NTPClient timeClient(ntpUDP, "0.openwrt.pool.ntp.org", 10800, 600000);
 //NTPClient timeClient(ntpUDP, "0.openwrt.pool.ntp.org", 10800, 600000);
 //NTPClient timeClient(ntpUDP);
 
 SPIDMD dmd(DISPLAYS_WIDE, DISPLAYS_HIGH, pin_noe, pin_A, pin_B, pin_sclk);
-DMD_TextBox box(dmd, 1, 0, 32, 16);
+DMD_TextBox box(dmd, 1, 0, 31, 16);
 
 unsigned long myTimer1;
 String getTime();
@@ -54,10 +54,15 @@ void setup(){
 }
 
 void loop() {
-    delay(1000);
-    if (millis() - myTimer1 >= 10*1000) {
+    while ( WiFi.status() != WL_CONNECTED ) {
+    Serial.print ( "." );
+    //ESP.restart();
+  }
+    //delay(3000);
+    if (millis() - myTimer1 >= 1000) {
       myTimer1 = millis();
       box.clear();
+      box.flush();        //дожидается окончания отправки буфера. А у Вас он видимо переполняется
       box.print(getTime());
       box.print(getDate());
     }
