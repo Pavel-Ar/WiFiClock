@@ -26,13 +26,13 @@ String getDate(unsigned long secs);
 
 const int WIDTH = 1;
 const uint8_t *FONT = SystemFont5x7;
-const char *ssid     = "fff";
-const char *password = "ppp";
+const char *ssid     = "SSID";
+const char *password = "PASS";
 uint32_t myTimer0, myTimer1;
 uint8_t brihgtness;
 
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, "ntp.ix.ru", 3*60*60 ,3*60*60);
+NTPClient timeClient(ntpUDP, "0.openwrt.pool.ntp.org", 3*60*60, 600000);
 
 SPIDMD dmd(DISPLAYS_WIDE, DISPLAYS_HIGH, pin_noe, pin_A, pin_B, pin_sclk);
 DMD_TextBox box(dmd, 1, 0, 32, 16);
@@ -53,7 +53,7 @@ void setup() {
 
   timeClient.begin();
 
-  dmd.setBrightness(2);
+  dmd.setBrightness(0);
   dmd.selectFont(FONT);
   dmd.begin();
 }
@@ -70,9 +70,9 @@ void loop() {
       unsigned long seconds = utime % 60;
       String secondStr = seconds < 10 ? "0" + String(seconds) : String(seconds);
 
-brihgtness = hours > 9 ? 10 : 2;
-brihgtness = hours > 19 ? 2 : 10;
-dmd.setBrightness(brihgtness);
+//brihgtness = hours > 9 ? 10 : 2;
+//brihgtness = hours > 19 ? 2 : 10;
+//dmd.setBrightness(brihgtness);
 
 //  if ( (hours > 9) && (hours < 17) ) {
 //    dmd.setBrightness(10);
@@ -80,9 +80,13 @@ dmd.setBrightness(brihgtness);
 //      dmd.setBrightness(2);;
 //  }
 
+brihgtness = ( (hours > 8) && (hours < 20) ) ? 2 : 1; //с 8 утра до 20 вечера яркость 2 все остальное время 1
+dmd.setBrightness(brihgtness);
+
       box.clear();
       box.print(hoursStr+":"+minuteStr);
       box.print(getDate(utime));
+
   }
   if (millis() - myTimer1 >= 60*1000) {
         myTimer1 = millis();
