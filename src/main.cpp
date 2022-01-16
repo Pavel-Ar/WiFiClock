@@ -1,16 +1,11 @@
-#include <SPI.h>
-#include <DMD2.h>
-
-#include <fonts/Arial_Black_16.h>
-#include <fonts/Arial14.h>
-#include <fonts/Droid_Sans_12.h>
-#include <fonts/Droid_Sans_16.h>
-#include <fonts/Droid_Sans_24.h>
-#include <fonts/SystemFont5x7.h>
-
 #include <NTPClient.h>
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
+
+#include <SPI.h>
+#include <DMD2.h>
+
+#include <fonts/SystemFont5x7.h>
 
 #define pin_A 16
 #define pin_B 12
@@ -22,68 +17,70 @@
 #define DISPLAYS_WIDE 1
 #define DISPLAYS_HIGH 1
 #define LEAP_YEAR(Y)     ( (Y>0) && !(Y%4) && ( (Y%100) || !(Y%400) ) )
-String getDate(unsigned long secs);
 
-const int WIDTH = 1;
-const uint8_t *FONT = SystemFont5x7;
-const char *ssid     = "SSID";
-const char *password = "PASS";
-uint32_t myTimer0;
-uint8_t brihgtness;
-
+const char *ssid     = "(-Wi-Fi-)";
+const char *password = "007007007";
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, "0.openwrt.pool.ntp.org", 3*60*60, 600000);
+NTPClient timeClient(ntpUDP, "ntp.moz.su", 10800, 600000);
+//NTPClient timeClient(ntpUDP, "0.openwrt.pool.ntp.org", 10800, 600000);
+//NTPClient timeClient(ntpUDP);
 
 SPIDMD dmd(DISPLAYS_WIDE, DISPLAYS_HIGH, pin_noe, pin_A, pin_B, pin_sclk);
 DMD_TextBox box(dmd, 1, 0, 32, 16);
 
-void setup() {
-  Serial.begin(115200);
+unsigned long myTimer1;
+String getTime();
+String getDate();
 
-    WiFi.begin(ssid, password);
+void setup(){
+  Serial.begin(115200);
+  WiFi.begin(ssid, password);
+
   while ( WiFi.status() != WL_CONNECTED ) {
     delay ( 500 );
-    Serial.print ( '.' );
+    Serial.print ( "." );
   }
-  if (WiFi.getAutoConnect() != true){     //configuration will be saved into SDK flash area
-    WiFi.setAutoConnect(true);            //on power-on automatically connects to last used hwAP
-    WiFi.setAutoReconnect(true);          //automatically reconnects to hwAP in case it's disconnected
+  if (WiFi.getAutoConnect() != true){
+      WiFi.setAutoConnect(true);
+      WiFi.setAutoReconnect(true);
   }
-  Serial.println(F("\nWiFi Connected"));
 
+  Serial.println(F("\nWiFi Connected"));
   timeClient.begin();
 
   dmd.setBrightness(0);
-  dmd.selectFont(FONT);
+  dmd.selectFont(SystemFont5x7);
   dmd.begin();
 }
 
 void loop() {
-  if(WiFi.status() == WL_CONNECTED){
-    timeClient.update();
-  
-  if (millis() - myTimer0 >= 10*1000) {
-    myTimer0 = millis();
+    delay(1000);
+    if (millis() - myTimer1 >= 10*1000) {
+      myTimer1 = millis();
+      box.clear();
+      box.print(getTime());
+      box.print(getDate());
+    }
+}
+
+String getTime(){
+      timeClient.update();
       unsigned long utime = timeClient.getEpochTime();
       unsigned long hours = (utime % 86400L) / 3600;
       String hoursStr = hours < 10 ? "0" + String(hours) : String(hours);
       unsigned long minutes = (utime % 3600) / 60;
       String minuteStr = minutes < 10 ? "0" + String(minutes) : String(minutes);
-      unsigned long seconds = utime % 60;
-      String secondStr = seconds < 10 ? "0" + String(seconds) : String(seconds);
 
-      brihgtness = ( (hours > 8) && (hours < 20) ) ? 2 : 1;
+      uint8_t brihgtness = ( (hours > 8) && (hours < 20) ) ? 2 : 1;
       dmd.setBrightness(brihgtness);
 
-      box.clear();
-      box.print(hoursStr+":"+minuteStr);
-      box.print(getDate(utime));
-  }
- }
+      Serial.println(timeClient.getFormattedTime());
+      return hoursStr+":"+minuteStr;
 }
 
-String getDate(unsigned long secs) {
-  unsigned long rawTime = secs / 86400L;  // in days
+String getDate() {
+  unsigned long utime = timeClient.getEpochTime();
+  unsigned long rawTime = utime / 86400L;  // in days
   unsigned long days = 0, year = 1970;
   uint8_t month;
   static const uint8_t monthDays[]={31,28,31,30,31,30,31,31,30,31,30,31};
