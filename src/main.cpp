@@ -28,7 +28,7 @@ const int WIDTH = 1;
 const uint8_t *FONT = SystemFont5x7;
 const char *ssid     = "SSID";
 const char *password = "PASS";
-uint32_t myTimer0, myTimer1;
+uint32_t myTimer0;
 uint8_t brihgtness;
 
 WiFiUDP ntpUDP;
@@ -59,7 +59,9 @@ void setup() {
 }
 
 void loop() {
-  timeClient.update();
+  if(WiFi.status() == WL_CONNECTED){
+    timeClient.update();
+  
   if (millis() - myTimer0 >= 10*1000) {
     myTimer0 = millis();
       unsigned long utime = timeClient.getEpochTime();
@@ -70,28 +72,14 @@ void loop() {
       unsigned long seconds = utime % 60;
       String secondStr = seconds < 10 ? "0" + String(seconds) : String(seconds);
 
-//brihgtness = hours > 9 ? 10 : 2;
-//brihgtness = hours > 19 ? 2 : 10;
-//dmd.setBrightness(brihgtness);
-
-//  if ( (hours > 9) && (hours < 17) ) {
-//    dmd.setBrightness(10);
-//    } else {
-//      dmd.setBrightness(2);;
-//  }
-
-brihgtness = ( (hours > 8) && (hours < 20) ) ? 2 : 1; //с 8 утра до 20 вечера яркость 2 все остальное время 1
-dmd.setBrightness(brihgtness);
+      brihgtness = ( (hours > 8) && (hours < 20) ) ? 2 : 1;
+      dmd.setBrightness(brihgtness);
 
       box.clear();
       box.print(hoursStr+":"+minuteStr);
       box.print(getDate(utime));
-
   }
-  if (millis() - myTimer1 >= 60*1000) {
-        myTimer1 = millis();
-      Serial.println(timeClient.getFormattedTime()+" "+getDate(timeClient.getEpochTime()) );
-  }
+ }
 }
 
 String getDate(unsigned long secs) {
